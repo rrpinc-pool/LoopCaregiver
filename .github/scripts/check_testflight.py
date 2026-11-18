@@ -39,16 +39,12 @@ for suffix in ("LoopFollow", "loopkit.LoopCaregiver"):
     for build in builds:
         detail = get("builds/" + build["id"] + "/buildBetaDetail")["data"]["attributes"]
         version = get("builds/" + build["id"] + "/preReleaseVersion")["data"]["attributes"]["version"]
-        groups = get("builds/" + build["id"] + "/betaGroups")["data"]
         attributes = build["attributes"]
         results.append({
             "app": app["attributes"]["name"], "version": version,
             "build": attributes["version"], "processing": attributes["processingState"],
             "expires": attributes["expirationDate"], "minimumOS": attributes["minOsVersion"],
             "beta": detail,
-            "groups": [{"name": group["attributes"]["name"],
-                        "internal": group["attributes"].get("isInternalGroup")}
-                       for group in groups],
         })
 print(json.dumps(results, indent=2))
 with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
