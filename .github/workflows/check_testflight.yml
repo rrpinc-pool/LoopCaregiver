@@ -1,0 +1,24 @@
+name: Check Apple TestFlight availability
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - name: Install API signing libraries
+        run: |
+          python3 -m venv "$RUNNER_TEMP/apple-status"
+          "$RUNNER_TEMP/apple-status/bin/pip" install --disable-pip-version-check PyJWT cryptography
+      - name: Read processing and beta testing states
+        env:
+          TEAMID: ${{ secrets.TEAMID }}
+          FASTLANE_KEY_ID: ${{ secrets.FASTLANE_KEY_ID }}
+          FASTLANE_ISSUER_ID: ${{ secrets.FASTLANE_ISSUER_ID }}
+          FASTLANE_KEY: ${{ secrets.FASTLANE_KEY }}
+        run: '"$RUNNER_TEMP/apple-status/bin/python" .github/scripts/check_testflight.py'
